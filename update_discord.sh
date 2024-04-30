@@ -7,7 +7,6 @@ function log {
 log "script started"
 
 DOES_SCIRPT_AUTORUN="$(grep -R update_discord /etc/rc.local)"
-echo $DOES_SCIRPT_AUTORUN
 if [  ! "$DOES_SCIRPT_AUTORUN" ];then
 	printf "Do you want to make this script autorun on startup (Y/N)?"
 	read answer
