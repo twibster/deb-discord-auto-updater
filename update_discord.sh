@@ -1,7 +1,16 @@
 #!/bin/bash
 
+if [ "$EUID" -ne 0 ];then
+	printf  "$(tput setaf 1)Please run the script as root\n"
+	exit
+fi
+
+HOME="$(getent passwd $SUDO_USER | cut -d: -f6)"
+PARENT_DIRECTORY="$HOME/discord-auto-updater"
+mkdir -p $PARENT_DIRECTORY
+
 function log {
-	echo "[ $(date '+%Y-%m-%d %H:%M:%S') ] - $1" >> update_discord_log.txt
+	echo "[ $(date '+%Y-%m-%d %H:%M:%S') ] - $1" >> "$PARENT_DIRECTORY/update_discord_log.txt"
 }
 
 log "script started"
@@ -12,9 +21,8 @@ if [  ! "$DOES_SCIRPT_AUTORUN" ];then
 	read ANSWER
 
 	if [ "$ANSWER" != "${ANSWER#[Yy]}" ];then
-		PATH_TO_SCRIPT="$(pwd)/update_discord.sh"
-		echo $PATH_TO_SCRIPT
-		echo $PATH_TO_SCRIPT >> /etc/rc.local
+		cp $0 $PARENT_DIRECTORY
+		echo "$PARENT_DIRECTORY/update_discord.sh" >> /etc/rc.local
 		chmod +x /etc/rc.local
 		log "script added to autorn procedure"
 	else
@@ -35,13 +43,12 @@ else
 	if [ $CURRENT_APP_VERSION != $LATEST_APP_VERSION ];then
 		wget -O $FILE_NAME  "https://discord.com/api/download/stable?platform=linux&format=deb"
 		sudo dpkg -i $FILE_NAME
-		rm -f $FILE_NAME
 		printf "$(tput setaf 2)Discord has been updated to ${LATEST_APP_VERSION}\n"
 		log "discord has been updated to ${LATEST_APP_VERSION}"
 	else
 		printf "$(tput setaf 3)Discord is already updated to the latest version -> ${LATEST_APP_VERSION}\n"
 		log "discord is already updated to the latest version -> ${LATEST_APP_VERSION}"
 	fi
-	rm -f version.txt
+	rm -f $FILE_NAME version.txt
 fi
 exit 0
