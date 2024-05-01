@@ -9,9 +9,9 @@ log "script started"
 DOES_SCIRPT_AUTORUN="$(grep -R update_discord /etc/rc.local)"
 if [  ! "$DOES_SCIRPT_AUTORUN" ];then
 	printf "Do you want to make this script autorun on startup (Y/N)?"
-	read answer
+	read ANSWER
 
-	if [ "$answer" != "${answer#[Yy]}" ];then
+	if [ "$ANSWER" != "${ANSWER#[Yy]}" ];then
 		PATH_TO_SCRIPT="$(pwd)/update_discord.sh"
 		echo $PATH_TO_SCRIPT
 		echo $PATH_TO_SCRIPT >> /etc/rc.local
